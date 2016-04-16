@@ -10,7 +10,7 @@ headers = {
 
 // Example usage
 //analyze_sentiment("Omg I can't stand Christine. I love her, but I hate her too. You know?", mycallback);
-analyze_key_phrases("Omg I can't stand Christine. I love her, but I hate her too. You know?", mycallback);
+analyze_key_phrases("Omg I can't stand Christine Smith. I love her, but I hate her too. You know?", mycallback);
 
 function analyze_sentiment(msg, callback) {
   url = base_url + "/sentiment";
@@ -43,24 +43,31 @@ function analyze_key_phrases(msg, callback) {
 
   body = {"documents": [{"id": "msg", "text": msg}]};
 
-  console.log(body);
-
   var options = {
     url: url,
     headers: headers,
     json: body
   }
 
-  request.post(options, callback);
+  function internal_callback(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      if("documents" in body && body.documents.length >= 1) {
+        if("keyPhrases" in body.documents[0]) {
+          callback(error, response, body.documents[0].keyPhrases);
+          return;
+        }
+      }
+    }
+    callback(error, response, body);
+  };
+
+  request.post(options, internal_callback);
 }
 
 function mycallback(error, response, body) {
-  console.log(body)
-  console.log(error)
   if (!error && response.statusCode == 200) {
-    console.log(body) // Show the HTML for the Google homepage.
-    console.log(body.documents[0].keyPhrases);
+    console.log(body);
   }
-  console.log(response.statusCode)
+  console.log(response.statusCode);
 }
 
