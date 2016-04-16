@@ -1,11 +1,18 @@
 var ms = require('./ms_text_analysis');
 var profanity = require('profanity-util');
 
+var fs = require('fs');
+var path = require('path');
+
+
 module.exports = {
   determine_name: determine_name,
   is_clean: is_clean,
   is_affirmative: is_affirmative
 };
+
+names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });
+names.split("\n")
 
 /*
  * Determine's the name of the friend to contact.
@@ -19,17 +26,49 @@ module.exports = {
 function determine_name(msg, callback) {
   function mycallback(error, response, data) {
     if(!error && response.statusCode ==200) {
+      candidates = generate_two_grams(msg);
+      for(var c in candidates) {
+        names = c.split(" ")
+        if( names[0][0] == names[0][0].toUpperCase()) { candidates[c] +=1; }; // First character capitalized
+        if( names[1][0] == names[1][0].toUpperCase()) { candidates[c] +=1; }; // Second character capitalized
+        if( names.indexOf(c[0].toLowerCase()) >= 0) { candidates[c] +=1; };
+        if( names.indexOf(c[1].toLowerCase()) >= 0) { candidates[c] +=1; };
+      }
       for( i=0; i<data.length; i++) {
         words = data[i].split(" ");
-        if(words.length) {
-          callback(data[i]);
-          return;
+        if(words.length == 2 && (data in candidates)) {
+          candidates[data] +=1;
         }
       }
-      callback(null);
-      return
+      callback(max_candidate(candidates));
     }
   };
+
+  function generate_two_grams(msg) {
+    words = msg.split(" ");
+    candidates = [];
+    for(j = 0; j < (words.length - 1); j++) {
+      candidates.push(words[j] + " " + words[j+1])
+    }
+    dict = {};
+    for(c in candidates) {
+      dict[candidates[c]] = 1
+    }
+    return dict;
+  }
+
+  function max_candidate(cans) {
+    name = null
+    score = -1;
+    for( can in cans) {
+      if(cans[can] > score) {
+        name = can;
+        score = cans[can];
+      }
+    }
+    return name
+  }
+
   ms.key_phrases(msg, mycallback);
 }
 
@@ -97,7 +136,4 @@ function is_affirmative(msg) {
     return false
 }
 
-console.log(is_affirmative("yeah"));
-console.log(is_affirmative("yes"));
-console.log(is_affirmative("sure"));
-console.log(is_affirmative("Ok, I guess we can"));
+determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
