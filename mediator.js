@@ -26,6 +26,7 @@ var state = {
 
 bot.on('message', (payload, reply) => {
   let text = payload.message.text
+  var response = ""
 
   bot.getProfile(payload.sender.id, (err, profile) => {
     if (err) throw err
@@ -53,13 +54,15 @@ bot.on('message', (payload, reply) => {
 	    		"conversation":[]
 	    	}
     	})
+
+    	// Initial response
+    	response = "Hmm, sounds like you could use a mediator."
     }
 
     // Update global array with convo info
     people[name]["conversation"].push(text)
 
     // Update id if isn't already stored
-    var response = ""
     if (people[name]["id"] == "") {
     	people[name]["id"] = payload.sender.id
     	response = "Hi " + profile.first_name + "! " + people[name]["correspondent_name"] + " requested to start a mediation session with you. Is now a good time?"
@@ -69,10 +72,13 @@ bot.on('message', (payload, reply) => {
     else {
     	switch(people[name]["mediation_state"]) {
 		    case state.INITIAL_RULES:
-		        response = "Hmm, sounds like you could use a mediator. Let's first agree to some ground rules:"
-				bot.sendMessage(payload.sender.id, {"text":"Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise."}, (err, info) => { 
-					if (err) console.log(err)
-					bot.sendMessage(payload.sender.id, {"text":"Are you willing to follow them?"}, (err, info) => { if (err) console.log(err) })
+		    	if (response == "") response = "Sweet!" // P2 start
+		    	bot.sendMessage(payload.sender.id, {"text":"Let's first agree to some ground rules:"}, (err, info) => {
+		    		if (err) console.log(err)
+					bot.sendMessage(payload.sender.id, {"text":"Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise."}, (err, info) => { 
+						if (err) console.log(err)
+						bot.sendMessage(payload.sender.id, {"text":"Are you willing to follow them?"}, (err, info) => { if (err) console.log(err) })
+					})
 				})
 				people[name]["mediation_state"] = state.INITIAL_YOU
 		        break;
@@ -96,6 +102,7 @@ bot.on('message', (payload, reply) => {
 		    	break;
 		    default:
 		        //default code block
+		        break;
 		}
     }
 
