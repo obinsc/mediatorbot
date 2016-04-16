@@ -25,6 +25,8 @@ function determine_name(msg, callback) {
           return;
         }
       }
+      callback(null);
+      return
     }
   };
   ms.key_phrases(msg, mycallback);
