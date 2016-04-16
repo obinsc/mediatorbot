@@ -2,6 +2,7 @@
 
 const http = require('http')
 const Bot = require('messenger-bot')
+const utils = require('./utils.js')
 
 let bot = new Bot({
   token: 'CAAOtqaBBm0cBAGLEGkflZANFKDA5PGZBsZAc8sM4exAJm2L2OgUGIJu7ZC24RbCTVJihAOG4ZBwhOlRCZCZBcuH5n9VTS0ZAqZBIgF3kOYVd4eI2fI79ILwXmcPvXhLAZA2BGaiXdOGfV83O7ZBSCW2XZB1NJZB0Aa1ajfZCMe8ZBZAJNnQ34DSAQ9gpKxkY6zaP76uwZC4C97jsc4JEqEQZDZD'
@@ -31,23 +32,26 @@ bot.on('message', (payload, reply) => {
 
     var name = profile.first_name + ' ' + profile.last_name
 
-	// Store convo in global array
+	// Initialize entry in global array
     if (!(name in people)) {
     	people[name] = {
     		"id": payload.sender.id,
     		"correspondent_name":"",
-    		"correspondent_id":"",
     		"mediation_state":0,
     		"conversation":[]
     	}
+    	utils.determine_name(text, (c_name) => {
+    		people[name]["correspondent_name"] = c_name
+    	})
     }
 
+    // Update global array with convo info
     people[name]["conversation"].push(text)
 
     // Logic
 
     // Code to send message to correspondent
-    // bot.sendMessage(people[name]["correspondent_id"], {"text":text}, (err, info) => {
+    // bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":text}, (err, info) => {
     // 	if (err) console.log(err)
     // })
 
@@ -62,36 +66,36 @@ bot.on('message', (payload, reply) => {
   })
 })
 
-state_fns = {
-  function state_initial_rules(profile, msg) {
-  };
+// state_fns = {
+//   function state_initial_rules(profile, msg) {
+//   };
 
-  function state_initial_you(profile, msg) {
-  };
+//   function state_initial_you(profile, msg) {
+//   };
 
-  function state_initial_forwarding(profile, msg) {
-  };
+//   function state_initial_forwarding(profile, msg) {
+//   };
 
-  function state_problem_definition(profile, msg) {
-  };
+//   function state_problem_definition(profile, msg) {
+//   };
 
-  function state_problem_restate(profile, msg) {
-  };
+//   function state_problem_restate(profile, msg) {
+//   };
 
-  function state_problem_propose(profile, msg) {
-  };
+//   function state_problem_propose(profile, msg) {
+//   };
 
-  function state_solution_propose(profile, msg) {
-  };
+//   function state_solution_propose(profile, msg) {
+//   };
 
-  function state_solution_discuss(profile, msg) {
-  };
+//   function state_solution_discuss(profile, msg) {
+//   };
 
-  function state_solution_resolved(profile, msg) {
-  };
+//   function state_solution_resolved(profile, msg) {
+//   };
 
-  function state_thank_you(profile, msg) {
-  };
-}
+//   function state_thank_you(profile, msg) {
+//   };
+// }
 
 http.createServer(bot.middleware()).listen(8445)
