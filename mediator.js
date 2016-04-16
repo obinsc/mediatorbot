@@ -38,7 +38,7 @@ bot.on('message', (payload, reply) => {
     	people[name] = {
     		"id": payload.sender.id,
     		"correspondent_name":"",
-    		"mediation_state":0,
+    		"mediation_state":state.INITIAL_RULES,
     		"conversation":[]
     	}
 
@@ -50,7 +50,7 @@ bot.on('message', (payload, reply) => {
     		people[c_name] = {
 	    		"id": "",
 	    		"correspondent_name":name,
-	    		"mediation_state":0,
+	    		"mediation_state":state.INITIAL_RULES,
 	    		"conversation":[]
 	    	}
     	})
@@ -70,6 +70,7 @@ bot.on('message', (payload, reply) => {
 
     // Main conversation Logic
     else {
+    	var correspondent_fname = people[name]["correspondent_name"].split(" ")[0]
     	switch(people[name]["mediation_state"]) {
 		    case state.INITIAL_RULES:
 		    	if (response == "") response = "Sweet!" // P2 start
@@ -83,7 +84,7 @@ bot.on('message', (payload, reply) => {
 				people[name]["mediation_state"] = state.INITIAL_YOU
 		        break;
 		    case state.INITIAL_YOU:
-		    	if (text == "yes") {
+		    	if (utils.is_affirmative(text)) {
 		    		response = 'Great! I also ask that you use the word "I" and avoid using the word "you," as that may come off as accusatory to the other person. Are you okay with that?'
 		    		people[name]["mediation_state"] = state.INITIAL_FORWARDING
 		    	} else {
@@ -91,25 +92,43 @@ bot.on('message', (payload, reply) => {
 		    	}
 		    	break;
 		    case state.INITIAL_FORWARDING:
-		    	if (text == "yes") {
-		    		response = "Awesome. Keep in mind that we'll be relaying your messages to " + people[name]["correspondent_name"].split(" ")[0] + ", and " + people[name]["correspondent_name"].split(" ")[0] + "'s messages to you."
-		    		people[name]["mediation_state"] = state.PROBLEM_DEFINITION;
+		    	if (utils.is_affirmative(text)) {
+		    		response = "Awesome. Keep in mind that we'll be relaying your messages to " + correspondent_fname + ", and " + correspondent_fname + "'s messages to you."
+		    		people[name]["mediation_state"] = state.PROBLEM_DEFINITION
 		    	} else {
 		    		response = "Why don't you take a walk and then come back when you're ready to proceed?"
 		    	}
 		        break;
 		    case state.PROBLEM_DEFINITION:
+		    	if (utils.is_affirmative(text)) {
+		    		response = "Alright! Let's get started: tell " + correspondent_fname + " what the problem is, in your own words."
+		    		people[name]["mediation_state"] = state.PROBLEM_RESTATE
+		    	} else {
+		    		response = "Why don't you take a walk and then come back when you're ready to proceed?"
+		    	}
+		    	break;
+		    case state.PROBLEM_RESTATE:
+		    	if (utils.is_clean(text)) {
+		    		if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_PROPOSE) {
+		    			// Only forward problem restatements after both parties have sent in theirs
+			    		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+text+'"'}, (err, info) => { if (err) console.log(err) })
+			    		var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+			    		response = 'Summer says: "' + correspondent_responses[correspondent_responses.length-1] + '"'
+			    	} else {
+			    		response = correspondent_fname + " says: "
+			    	}
+			    	people[name]["mediation_state"] = state.SOLUTION_PROPOSE;
+		    	} else {
+		    		response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+		    	}
+		    	break;
+		    case state.SOLUTION_PROPOSE:
 		    	break;
 		    default:
 		        //default code block
 		        break;
 		}
     }
-
-    // Code to send message to correspondent
-    // bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":text}, (err, info) => {
-    // 	if (err) console.log(err)
-    // })
 
     reply({ "text":response }, (err) => {
       if (err) throw err

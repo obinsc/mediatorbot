@@ -85,6 +85,8 @@ function is_clean(msg) {
 function is_affirmative(msg) {
   affirmative_list = [
     "ok",
+    "k",
+    "kk",
     "okay",
     "yes",
     "affirmative",
@@ -121,7 +123,8 @@ function is_affirmative(msg) {
     "very well",
     "willingly",
     "without fail",
-    "yep"]
+    "yep",
+    "yup"]
     msg = msg.toLowerCase();
     if(affirmative_list.indexOf(msg) >=0) {
       return true
@@ -136,4 +139,4 @@ function is_affirmative(msg) {
     return false
 }
 
-determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
+//determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
