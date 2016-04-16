@@ -14,6 +14,9 @@ module.exports = {
 names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });
 names.split("\n")
 
+affirmative_list = fs.readFileSync('./data/yes.txt', {encoding: 'utf8' });
+affirmative_list.split("\n")
+
 /*
  * Determine's the name of the friend to contact.
  * msg: String message entered by the fbuser
@@ -83,48 +86,6 @@ function is_clean(msg) {
 }
 
 function is_affirmative(msg) {
-  affirmative_list = [
-    "ok",
-    "k",
-    "kk",
-    "okay",
-    "yes",
-    "affirmative",
-    "amen",
-    "fine",
-    "good",
-    "okay",
-    "true",
-    "sure",
-    "yeah",
-    "yea",
-    "all right",
-    "aye",
-    "beyond a doubt",
-    "by all means",
-    "certainly",
-    "definitely",
-    "even so",
-    "exactly",
-    "gladly",
-    "good enough",
-    "granted",
-    "indubitably",
-    "just so",
-    "most assuredly",
-    "naturally",
-    "of course",
-    "positively",
-    "precisely",
-    "sure thing",
-    "surely",
-    "undoubtedly",,
-    "unquestionably",
-    "very well",
-    "willingly",
-    "without fail",
-    "yep",
-    "yup"]
     msg = msg.toLowerCase();
     if(affirmative_list.indexOf(msg) >=0) {
       return true
