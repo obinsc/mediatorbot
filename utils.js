@@ -3,7 +3,8 @@ var profanity = require('profanity-util');
 
 module.exports = {
   determine_name: determine_name,
-  is_clean: is_clean
+  is_clean: is_clean,
+  is_affirmative: is_affirmative
 };
 
 /*
@@ -41,3 +42,62 @@ function is_clean(msg) {
     return true;
   }
 }
+
+function is_affirmative(msg) {
+  affirmative_list = [
+    "ok",
+    "okay",
+    "yes",
+    "affirmative",
+    "amen",
+    "fine",
+    "good",
+    "okay",
+    "true",
+    "sure",
+    "yeah",
+    "yea",
+    "all right",
+    "aye",
+    "beyond a doubt",
+    "by all means",
+    "certainly",
+    "definitely",
+    "even so",
+    "exactly",
+    "gladly",
+    "good enough",
+    "granted",
+    "indubitably",
+    "just so",
+    "most assuredly",
+    "naturally",
+    "of course",
+    "positively",
+    "precisely",
+    "sure thing",
+    "surely",
+    "undoubtedly",,
+    "unquestionably",
+    "very well",
+    "willingly",
+    "without fail",
+    "yep"]
+    msg = msg.toLowerCase();
+    if(affirmative_list.indexOf(msg) >=0) {
+      return true
+    } else {
+      words = msg.split(" ")
+      for(i=0; i< words.length; i++) {
+        if(affirmative_list.indexOf(words[i]) >=0) {
+          return true
+        }
+      }
+    }
+    return false
+}
+
+console.log(is_affirmative("yeah"));
+console.log(is_affirmative("yes"));
+console.log(is_affirmative("sure"));
+console.log(is_affirmative("Ok, I guess we can"));
