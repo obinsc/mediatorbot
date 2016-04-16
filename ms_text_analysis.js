@@ -1,7 +1,12 @@
 var request = require('request');
+
+module.exports = {
+  sentiment: analyze_sentiment,
+  key_phrases: analyze_key_phrases
+};
+
 base_url = "https://westus.api.cognitive.microsoft.com/text/analytics/v2.0"
 account_key = "034ab9bb48a342889d7f77823d3522b2"
-
 headers = {
   "Ocp-Apim-Subscription-Key": account_key,
   "Content-Type": "application/json",
@@ -10,7 +15,7 @@ headers = {
 
 // Example usage
 //analyze_sentiment("Omg I can't stand Christine. I love her, but I hate her too. You know?", mycallback);
-analyze_key_phrases("Omg I can't stand Christine Smith. I love her, but I hate her too. You know?", mycallback);
+//analyze_key_phrases("Omg I can't stand Christine Smith. I love her, but I hate her too. You know?", mycallback);
 
 function analyze_sentiment(msg, callback) {
   url = base_url + "/sentiment";
