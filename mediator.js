@@ -26,6 +26,7 @@ var state = {
 
 bot.on('message', (payload, reply) => {
   let text = payload.message.text
+  var response = ""
 
   bot.getProfile(payload.sender.id, (err, profile) => {
     if (err) throw err
@@ -40,25 +41,80 @@ bot.on('message', (payload, reply) => {
     		"mediation_state":0,
     		"conversation":[]
     	}
+
     	utils.determine_name(text, (c_name) => {
+    		// Store name
     		people[name]["correspondent_name"] = c_name
+
+    		// Create new name
+    		people[c_name] = {
+	    		"id": "",
+	    		"correspondent_name":name,
+	    		"mediation_state":0,
+	    		"conversation":[]
+	    	}
     	})
+
+    	// Initial response
+    	response = "Hmm, sounds like you could use a mediator."
     }
 
     // Update global array with convo info
     people[name]["conversation"].push(text)
 
-    // Logic
+    // Update id if isn't already stored
+    if (people[name]["id"] == "") {
+    	people[name]["id"] = payload.sender.id
+    	response = "Hi " + profile.first_name + "! " + people[name]["correspondent_name"] + " requested to start a mediation session with you. Is now a good time?"
+    }
+
+    // Main conversation Logic
+    else {
+    	switch(people[name]["mediation_state"]) {
+		    case state.INITIAL_RULES:
+		    	if (response == "") response = "Sweet!" // P2 start
+		    	bot.sendMessage(payload.sender.id, {"text":"Let's first agree to some ground rules:"}, (err, info) => {
+		    		if (err) console.log(err)
+					bot.sendMessage(payload.sender.id, {"text":"Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise."}, (err, info) => { 
+						if (err) console.log(err)
+						bot.sendMessage(payload.sender.id, {"text":"Are you willing to follow them?"}, (err, info) => { if (err) console.log(err) })
+					})
+				})
+				people[name]["mediation_state"] = state.INITIAL_YOU
+		        break;
+		    case state.INITIAL_YOU:
+		    	if (text == "yes") {
+		    		response = 'Great! I also ask that you use the word "I" and avoid using the word "you," as that may come off as accusatory to the other person. Are you okay with that?'
+		    		people[name]["mediation_state"] = state.INITIAL_FORWARDING
+		    	} else {
+		    		response = "Why don't you take a walk and then come back when you're ready to proceed?"
+		    	}
+		    	break;
+		    case state.INITIAL_FORWARDING:
+		    	if (text == "yes") {
+		    		response = "Awesome. Keep in mind that we'll be relaying your messages to " + people[name]["correspondent_name"].split(" ")[0] + ", and " + people[name]["correspondent_name"].split(" ")[0] + "'s messages to you."
+		    		people[name]["mediation_state"] = state.PROBLEM_DEFINITION;
+		    	} else {
+		    		response = "Why don't you take a walk and then come back when you're ready to proceed?"
+		    	}
+		        break;
+		    case state.PROBLEM_DEFINITION:
+		    	break;
+		    default:
+		        //default code block
+		        break;
+		}
+    }
 
     // Code to send message to correspondent
     // bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":text}, (err, info) => {
     // 	if (err) console.log(err)
     // })
 
-    reply({ text }, (err) => {
+    reply({ "text":response }, (err) => {
       if (err) throw err
 
-      console.log(`Echoed back to ${profile.first_name} ${profile.last_name}: ${text}`)
+      console.log(`Sent to ${profile.first_name} ${profile.last_name}: ${response}`)
 
   	  // spy
   	  console.log(people)
