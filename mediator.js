@@ -71,6 +71,7 @@ bot.on('message', (payload, reply) => {
     // Main conversation Logic
     else {
     	switch(people[name]["mediation_state"]) {
+    		correspondent_fname = people[name]["correspondent_name"].split(" ")[0]
 		    case state.INITIAL_RULES:
 		    	if (response == "") response = "Sweet!" // P2 start
 		    	bot.sendMessage(payload.sender.id, {"text":"Let's first agree to some ground rules:"}, (err, info) => {
@@ -92,24 +93,36 @@ bot.on('message', (payload, reply) => {
 		    	break;
 		    case state.INITIAL_FORWARDING:
 		    	if (text == "yes") {
-		    		response = "Awesome. Keep in mind that we'll be relaying your messages to " + people[name]["correspondent_name"].split(" ")[0] + ", and " + people[name]["correspondent_name"].split(" ")[0] + "'s messages to you."
-		    		people[name]["mediation_state"] = state.PROBLEM_DEFINITION;
+		    		response = "Awesome. Keep in mind that we'll be relaying your messages to " + correspondent_fname + ", and " + correspondent_fname + "'s messages to you."
+		    		people[name]["mediation_state"] = state.PROBLEM_DEFINITION
 		    	} else {
 		    		response = "Why don't you take a walk and then come back when you're ready to proceed?"
 		    	}
 		        break;
 		    case state.PROBLEM_DEFINITION:
+		    	if (text == "yes") {
+		    		response = "Alright! Let's get started: tell " + correspondent_fname + " what the problem is, in your own words."
+		    		people[name]["mediation_state"] = state.PROBLEM_RESTATE
+		    	} else {
+		    		response = "Why don't you take a walk and then come back when you're ready to proceed?"
+		    	}
+		    	break;
+		    case state.PROBLEM_RESTATE:
+		    	if (utils.is_clean(text)) {
+		    		if correspondent state is next
+			    		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":text}, (err, info) => { if (err) console.log(err) })
+			    	people[name]["mediation_state"] = state.SOLUTION_PROPOSE;
+		    	} else {
+		    		response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+		    	}
+		    	break;
+		    case state.SOLUTION_PROPOSE:
 		    	break;
 		    default:
 		        //default code block
 		        break;
 		}
     }
-
-    // Code to send message to correspondent
-    // bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":text}, (err, info) => {
-    // 	if (err) console.log(err)
-    // })
 
     reply({ "text":response }, (err) => {
       if (err) throw err
