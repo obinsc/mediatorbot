@@ -46,6 +46,8 @@ function is_clean(msg) {
 function is_affirmative(msg) {
   affirmative_list = [
     "ok",
+    "k",
+    "kk",
     "okay",
     "yes",
     "affirmative",
@@ -82,7 +84,8 @@ function is_affirmative(msg) {
     "very well",
     "willingly",
     "without fail",
-    "yep"]
+    "yep",
+    "yup"]
     msg = msg.toLowerCase();
     if(affirmative_list.indexOf(msg) >=0) {
       return true
@@ -96,8 +99,3 @@ function is_affirmative(msg) {
     }
     return false
 }
-
-console.log(is_affirmative("yeah"));
-console.log(is_affirmative("yes"));
-console.log(is_affirmative("sure"));
-console.log(is_affirmative("Ok, I guess we can"));
