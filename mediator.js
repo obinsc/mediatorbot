@@ -33,6 +33,11 @@ bot.on('message', (payload, reply) => {
 
     // Logic
 
+    // Code to send message to correspondent
+    // bot.sendMessage(people[name]["correspondent_id"], {"text":text}, (err, info) => {
+    // 	if (err) console.log(err)
+    // })
+
     reply({ text }, (err) => {
       if (err) throw err
 
