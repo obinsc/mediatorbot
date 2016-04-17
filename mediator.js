@@ -141,7 +141,7 @@ bot.on('delivery', (payload, reply) => {
     var last_message = people[human_name].last_message
     console.log("Inside the delivery listener")
     for (var key in msgFollowUps) {
-	    if(last_message.indexOf(key) >= 0) {
+	    if(last_message && last_message.indexOf(key) >= 0) {
 	      people[human_name].last_message = msgFollowUps[last_message]
 	      bot.sendMessage(payload.sender.id, {"text": msgFollowUps[last_message]}, (err, info) => {
 	        if (err) {console.log(err)
@@ -321,6 +321,7 @@ function state_solution_resolved(profile, msg, name, correspondent_fname) {
 };
 
 function state_thank_you(profile, msg, name, correspondent_fname) {
+  var response = ""
   if (!utils.is_clean(msg)) {
     return "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
   }
@@ -337,7 +338,7 @@ function state_thank_you(profile, msg, name, correspondent_fname) {
   }
   */
 
-  if(people[pepole[name]["correspondent_name"]]["mediation_state"] == state.DONE) {
+  if(people[people[name]["correspondent_name"]]["mediation_state"] == state.DONE) {
     // Only forward problem restatements after both parties have sent in theirs
     bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
 	if (err) console.log(err) 
