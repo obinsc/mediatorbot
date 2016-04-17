@@ -175,6 +175,10 @@ function initialize_new_convo(name, payload, callback) {
   idsToPpl[payload.sender.id] = name
 
   utils.determine_name(payload.message.text, (c_name) => {
+  	if (c_name == "") {
+  		callback("To get started, type the name person you want to start a session with using the following format: Firstname Lastname. Then have them message MediatorBot too.")
+  	}
+  	
     // Store name
     people[name]["correspondent_name"] = c_name
     console.log(c_name);
