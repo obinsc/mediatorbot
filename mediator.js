@@ -251,18 +251,17 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
       // Only forward problem restatements after both parties have sent in theirs
       bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
         if (err) console.log(err) 
+        console.log("HERE?")
         people[people[name]["correspondent_name"]].last_message =  "Now I want you to take a few minutes to brainstorm and propose a potential solution."
-        bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
+        bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { console.log("HEREHRERHHRER"); if (err) console.log(err) })
       })
       var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-      msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1];
       people[name].last_message = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+      msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1]+'"';
       bot.sendMessage(people[name].id, {"text": '"' + msg + '"'}, (err, info) => {
         if (err) console.log(err)
       })
-      console.log("Before Return")
-      people[name]["mediation_state"] = state.SOLUTION_DISCUSS;
-      return;
+      response = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
     } else {
       response = correspondent_fname + " says: "
     }
