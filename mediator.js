@@ -280,9 +280,11 @@ function state_solution_discuss(profile, msg, name, correspondent_fname) {
   if (utils.is_clean(msg)) {
     // Proceed to next stage when a word is triggered and both parties confirm
     if (utils.contains_done(msg)) {
-    	bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":msg}, (err, info) => { if (err) console.log(err) })
+    	bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":msg}, (err, info) => { 
+    		if (err) console.log(err) 
+    		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Have you both come to a resolution?"}, (err, info) => { if (err) console.log(err) })
+    	})
 		response = "Have you both come to a resolution?" // ASK FOR CONFORMATION
-		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Have you both come to a resolution?"}, (err, info) => { if (err) console.log(err) })
 		people[name]["mediation_state"] = state.SOLUTION_RESOLVED
 		people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_RESOLVED
     } else {
