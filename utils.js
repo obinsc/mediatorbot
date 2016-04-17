@@ -111,14 +111,9 @@ function is_affirmative(msg) {
 
 function contains_done(msg) {
   msg = msg.toLowerCase();
-  if(done_list.indexOf(msg) >=0) {
-    return true
-  } else {
-    words = msg.split(" ")
-    for(i=0; i< words.length; i++) {
-      if(done_list.indexOf(words[i]) >=0) {
-        return true
-      }
+  for (var i = 0; i < done_list.length; i++) {
+    if (msg.indexOf(done_list[i]) >= 0) {
+      return true
     }
   }
   return false
