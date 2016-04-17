@@ -41,9 +41,9 @@ bot.on('message', (payload, reply) => {
   let text = payload.message.text
 
   // Run sentiment analysis
-  sentiment.analyze_sentiment(text, (error, response, body) => {
-    myFirebaseRef.update({ "sentimentalScore": body })
-  });
+  //sentiment.analyze_sentiment(text, (error, response, body) => {
+    //myFirebaseRef.update({ "sentimentalScore": body })
+  //});
 
   var response = ""
 
@@ -119,6 +119,10 @@ bot.on('message', (payload, reply) => {
             break;
         }
       }
+
+      //Spy
+      //
+      console.log(people)
 
       reply({ "text":response }, (err) => {
         if (err) {
