@@ -136,19 +136,21 @@ bot.on('delivery', (payload, reply) => {
     var human_name = idsToPpl[payload.sender.id]
     var last_message = people[human_name].last_message
     console.log("Inside the delivery listener")
-    if(last_message in msgFollowUps) {
-      people[human_name].last_message = msgFollowUps[last_message]
-      bot.sendMessage(payload.sender.id, {"text": msgFollowUps[last_message]}, (err, info) => {
-        if (err) {console.log(err)
-        } else {
-        }})
-    } else if (last_message != undefined && last_message.indexOf("Great, I hope this has been productive.") >= 0) {
-      console.log("Removing conversation") 
-      delete people[people[human_name]["correspondent_name"]]
-      delete people[human_name]
-    } else {
-      console.log("Not something to listen for apparently")
-    }
+    for (var key in msgFollowUps) {
+	    if(last_message.indexOf(msgFollowUps) >= 0) {
+	      people[human_name].last_message = msgFollowUps[last_message]
+	      bot.sendMessage(payload.sender.id, {"text": msgFollowUps[last_message]}, (err, info) => {
+	        if (err) {console.log(err)
+	        } else {
+	        }})
+	    } else if (last_message != undefined && last_message.indexOf("Great, I hope this has been productive.") >= 0) {
+	      console.log("Removing conversation") 
+	      delete people[people[human_name]["correspondent_name"]]
+	      delete people[human_name]
+	    } else {
+	      console.log("Not something to listen for apparently")
+	    }
+	}
   }
 })
 
@@ -257,11 +259,7 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
       })
       var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
       people[name].last_message = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
-      msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1]+'"';
-      bot.sendMessage(people[name].id, {"text": '"' + msg + '"'}, (err, info) => {
-        if (err) console.log(err)
-      })
-      response = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+      response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1]+'"\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.';
     } else {
       response = correspondent_fname + " says: "
     }
