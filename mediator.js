@@ -340,15 +340,16 @@ function state_thank_you(profile, msg, name, correspondent_fname) {
   if(people[pepole[name]["correspondent_name"]]["mediation_state"] == state.DONE) {
     // Only forward problem restatements after both parties have sent in theirs
     bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
-      if (err) console.log(err) 
-        bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Great, I hope this has been productive. Consider hiring a human mediator for future problems."}, (err, info) => { if (err) console.log(err) })
-    })
-var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '.\n\n Great, I hope this has been productive. Consider hiring a human mediator for future problems.'
-  } else {
-    response = correspondent_fname + " says: "
-  }
-  people[name]["mediation_state"] = state.DONE;
+	if (err) console.log(err) 
+		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Great, I hope this has been productive. Consider hiring a human mediator for future problems."}, (err, info) => { if (err) console.log(err) })
+	})
+	var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+	response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '.\n\n Great, I hope this has been productive. Consider hiring a human mediator for future problems.'
+	} else {
+	response = correspondent_fname + " says: "
+	}
+	people[name]["mediation_state"] = state.DONE;
+	return response
 }
 
 
