@@ -52,14 +52,16 @@ bot.on('message', (payload, reply) => {
 
       if (!(name in people)) {
         initialize_new_convo(name, payload, (response) => {
+          people[name].last_message = response;
+          people[name]["mediation_state"] = state.INITIAL_YOU
           reply({ "text":response }, (err) => {
             if (err) {
               throw err
             } else {
-              people[name].last_message = response;
             }
           })
         })
+        return
       }
 
       // Update global array with convo info
@@ -78,7 +80,10 @@ bot.on('message', (payload, reply) => {
         switch(people[name]["mediation_state"]) {
           case state.INITIAL_RULES:
             console.log("Case: Initial Rules")
-          if (response == "") response = "Sweet!" // P2 start
+            console.log(response)
+            if (response == "") {
+              response = "Sweet!" // P2 start
+            }
             people[name]["mediation_state"] = state.INITIAL_YOU
           break;
           case state.INITIAL_YOU:
@@ -96,7 +101,7 @@ bot.on('message', (payload, reply) => {
             response = state_problem_restate(profile, text, name, correspondent_fname)
           break;
           case state.SOLUTION_PROPOSE:
-            response = state_problem_propose(profile, text, name, correspondent_fname)
+            response = state_solution_propose(profile, text, name, correspondent_fname)
           break;
           case state.SOLUTION_DISCUSS:
           	response = state_solution_discuss(profile, text)
@@ -130,10 +135,10 @@ bot.on('delivery', (payload, reply) => {
     var last_message = people[human_name].last_message
     console.log("Inside the delivery listener")
     if(last_message in msgFollowUps) {
+      people[human_name].last_message = msgFollowUps[last_message]
       bot.sendMessage(payload.sender.id, {"text": msgFollowUps[last_message]}, (err, info) => {
         if (err) {console.log(err)
         } else {
-          people[human_name].last_message = msgFollowUps[last_message]
         }})
     } else if (last_message.indexOf("Great, I hope this has been productive.") >= 0) {
       console.log("Removing conversation") 
@@ -174,7 +179,7 @@ function initialize_new_convo(name, payload, callback) {
       "mediation_state":state.INITIAL_RULES,
       "conversation":[]
     }
-    callback("Hmm, sounds like you coudl use a mediator.")
+    callback("Hmm, sounds like you could use a mediator.")
   })
 }
 
