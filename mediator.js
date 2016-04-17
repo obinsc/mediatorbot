@@ -106,7 +106,7 @@ bot.on('message', (payload, reply) => {
             response = state_solution_propose(profile, text, name, correspondent_fname)
           break;
           case state.SOLUTION_DISCUSS:
-            response = state_solution_discuss(profile, text)
+            response = state_solution_discuss(profile, text, name, correspondent_fname)
           break;
           case state.SOLUTION_RESOLVED:
             response = state_solution_resolved(profile, text, correspondent_fname)
@@ -136,6 +136,7 @@ bot.on('delivery', (payload, reply) => {
     var human_name = idsToPpl[payload.sender.id]
     var last_message = people[human_name].last_message
     console.log("Inside the delivery listener")
+    console.log("Does this need a follow up?:" +  last_message)
     if(last_message in msgFollowUps) {
       people[human_name].last_message = msgFollowUps[last_message]
       bot.sendMessage(payload.sender.id, {"text": msgFollowUps[last_message]}, (err, info) => {
@@ -256,9 +257,9 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
         bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { console.log("HEREHRERHHRER"); if (err) console.log(err) })
       })
       var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-      people[name].last_message = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+      people[name].last_message = 'Now I want you to take a few minutes to brainstorm and propose a potential solution.'
       msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1]+'"';
-      bot.sendMessage(people[name].id, {"text": '"' + msg + '"'}, (err, info) => {
+      bot.sendMessage(people[name].id, {"text": msg }, (err, info) => {
         if (err) console.log(err)
       })
       response = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
@@ -273,7 +274,7 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
   return response;
 };
 
-function state_solution_discuss(profile, msg) {
+function state_solution_discuss(profile, msg, name, correspondent_fname) {
   var response = "";
   if (utils.is_clean(msg)) {
     // Proceed to next stage when a word is triggered and both parties confirm
