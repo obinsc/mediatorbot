@@ -137,7 +137,7 @@ bot.on('delivery', (payload, reply) => {
     var last_message = people[human_name].last_message
     console.log("Inside the delivery listener")
     for (var key in msgFollowUps) {
-	    if(last_message.indexOf(msgFollowUps) >= 0) {
+	    if(last_message.indexOf(key) >= 0) {
 	      people[human_name].last_message = msgFollowUps[last_message]
 	      bot.sendMessage(payload.sender.id, {"text": msgFollowUps[last_message]}, (err, info) => {
 	        if (err) {console.log(err)
