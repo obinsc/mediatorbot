@@ -129,7 +129,7 @@ bot.on('message', (payload, reply) => {
           */
           break;
           case state.SOLUTION_PROPOSE:
-            response = state_problem_propose(profile, text, name, correspondent_fname)
+            response = state_solution_propose(profile, text, name, correspondent_fname)
             /*
             if (utils.is_clean(text)) {
             if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_DISCUSS) {
@@ -150,8 +150,10 @@ bot.on('message', (payload, reply) => {
           */
           break;
           case state.SOLUTION_DISCUSS:
+          	response = state_solution_discuss(profile, text)
             break;
           case state.SOLUTION_RESOLVED:
+          	response = state_solution_resolved(profile, text, correspondent_fname)
             break;
           case state.THANK_YOU:
             break;
@@ -199,7 +201,8 @@ function initialize_new_convo(name, payload, callback) {
     "correspondent_name":"",
     "mediation_state":state.INITIAL_RULES,
     "conversation":[],
-    "last_message":""
+    "last_message":"",
+    "is_done":false
   }
 
   idsToPpl[payload.sender.id] = name
@@ -276,7 +279,7 @@ function state_problem_restate(profile, msg, name, correspondent_fname) {
   return response
 };
 
-function state_problem_propose(profile, msg, name, correspondent_fname) {
+function state_solution_propose(profile, msg, name, correspondent_fname) {
   var response = "";
   if (utils.is_clean(msg)) {
     if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_DISCUSS) {
@@ -298,13 +301,45 @@ function state_problem_propose(profile, msg, name, correspondent_fname) {
   return response;
 };
 
-function state_solution_propose(profile, msg) {
-};
-
 function state_solution_discuss(profile, msg) {
+	var response = "";
+	if (utils.is_clean(msg)) {
+		// Proceed to next stage when a word is triggered and both parties confirm
+		if (utils.contains_done(msg)) {
+			response = "Have you both come to a resolution?" // ASK FOR CONFORMATION
+			people[name]["mediation_state"] = state.SOLUTION_RESOLVED
+			people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_RESOLVED
+		} else {
+			// Otherwise, forward message to other person
+			response = correspondent_fname + ' says: '
+			bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { if (err) console.log(err) })
+		}
+	} else {
+		response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+	}
+
+	return response;
 };
 
-function state_solution_resolved(profile, msg) {
+function state_solution_resolved(profile, msg, correspondent_fname) {
+	var response = "";
+	// Confirmation
+	if (utils.is_affirmative(msg)) {
+		people[name]["is_done"] = true
+		if (people[people[name]["correspondent_name"]]["is_done"] == true) {
+			people[name]["mediation_state"] = state.THANK_YOU
+			people[people[name]["correspondent_name"]]["mediation_state"] = state.THANK_YOU
+			response = "You both agree! Last step: please thank each other for working together to come to a compromise."
+			bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+response+'"'}, (err, info) => { if (err) console.log(err) })
+		} else {
+			response = "Great! Now we just need to wait for " + correspondent_fname + " to respond"
+		}
+	} else { // Go back
+		people[name]["mediation_state"] = state.SOLUTION_DISCUSS
+		people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_DISCUSS
+		response = "At least one of you didn't agree- I'll give you a few more minutes to talk this over"
+	}
+	return response;
 };
 
 function state_thank_you(profile, msg) {

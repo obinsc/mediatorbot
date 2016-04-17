@@ -20,6 +20,10 @@ affirmative_list = fs.readFileSync('./data/yes.txt', {encoding: 'utf8' });
 affirmative_list.split("\n")
 console.log("Yes loaded")
 
+done_list = fs.readFileSync('./data/done.txt', {encoding: 'utf8' });
+done_list.split("\n")
+console.log("Done loaded")
+
 /*
  * Determine's the name of the friend to contact.
  * msg: String message entered by the fbuser
@@ -101,6 +105,21 @@ function is_affirmative(msg) {
       }
     }
     return false
+}
+
+function contains_done(msg) {
+  msg = msg.toLowerCase();
+  if(done_list.indexOf(msg) >=0) {
+    return true
+  } else {
+    words = msg.split(" ")
+    for(i=0; i< words.length; i++) {
+      if(done_list.indexOf(words[i]) >=0) {
+        return true
+      }
+    }
+  }
+  return false
 }
 
 function process_closing(msg) {
