@@ -8,7 +8,8 @@ var path = require('path');
 module.exports = {
   determine_name: determine_name,
   is_clean: is_clean,
-  is_affirmative: is_affirmative
+  is_affirmative: is_affirmative,
+  process_closing: process_closing
 };
 
 names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });
@@ -98,6 +99,34 @@ function is_affirmative(msg) {
       }
     }
     return false
+}
+
+function process_closing(msg) {
+
+  function contains_thanks(mywords) {
+    if(msg.indexOf('thank') >= 0) {
+      return true
+    }
+    return false
+  }
+
+  function contains_apology(mywords) {
+    if(msg.indexof('sorry') >= 0 || msg.indexof('apolog')) {
+      return true
+    }
+    return false
+  }
+
+  words = msg.split(/[\.|\?]/);
+  // Too Short
+  if(words.length < 5) {
+    return {valid: false, error: 'TOO_SHORT'}
+  } else if (!contains_thanks(mywords)) {
+    return {valid: false, error: 'NO_THANKS'}
+  } else if (!contains_apology(mywords)) {
+    return {valid: false, error: 'NO_APOLOGY'}
+  } else {
+    return {valid: true}
 }
 
 //determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
