@@ -324,6 +324,7 @@ function state_thank_you(profile, msg, name, correspondent_fname) {
   if (!utils.is_clean(msg)) {
     return "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
   }
+  /*
   var res = utils.process_closing(msg)
   if (!res.valid) {
     if (res.error == 'TOO_SHORT') {
@@ -334,6 +335,7 @@ function state_thank_you(profile, msg, name, correspondent_fname) {
       return "Don't forget to apologize! Try it again please."
     }
   }
+  */
 
   if(people[pepole[name]["correspondent_name"]]["mediation_state"] == state.DONE) {
     // Only forward problem restatements after both parties have sent in theirs
