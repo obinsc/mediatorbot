@@ -8,11 +8,17 @@ var path = require('path');
 module.exports = {
   determine_name: determine_name,
   is_clean: is_clean,
-  is_affirmative: is_affirmative
+  is_affirmative: is_affirmative,
+  process_closing: process_closing
 };
 
 names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });
 names.split("\n")
+console.log("Names loaded")
+
+affirmative_list = fs.readFileSync('./data/yes.txt', {encoding: 'utf8' });
+affirmative_list.split("\n")
+console.log("Yes loaded")
 
 /*
  * Determine's the name of the friend to contact.
@@ -83,48 +89,6 @@ function is_clean(msg) {
 }
 
 function is_affirmative(msg) {
-  affirmative_list = [
-    "ok",
-    "k",
-    "kk",
-    "okay",
-    "yes",
-    "affirmative",
-    "amen",
-    "fine",
-    "good",
-    "okay",
-    "true",
-    "sure",
-    "yeah",
-    "yea",
-    "all right",
-    "aye",
-    "beyond a doubt",
-    "by all means",
-    "certainly",
-    "definitely",
-    "even so",
-    "exactly",
-    "gladly",
-    "good enough",
-    "granted",
-    "indubitably",
-    "just so",
-    "most assuredly",
-    "naturally",
-    "of course",
-    "positively",
-    "precisely",
-    "sure thing",
-    "surely",
-    "undoubtedly",,
-    "unquestionably",
-    "very well",
-    "willingly",
-    "without fail",
-    "yep",
-    "yup"]
     msg = msg.toLowerCase();
     if(affirmative_list.indexOf(msg) >=0) {
       return true
@@ -137,6 +101,35 @@ function is_affirmative(msg) {
       }
     }
     return false
+}
+
+function process_closing(msg) {
+
+  function contains_thanks(mywords) {
+    if(msg.indexOf('thank') >= 0) {
+      return true
+    }
+    return false
+  }
+
+  function contains_apology(mywords) {
+    if(msg.indexof('sorry') >= 0 || msg.indexof('apolog')) {
+      return true
+    }
+    return false
+  }
+
+  words = msg.split(/[\.|\?]/);
+  // Too Short
+  if(words.length < 5) {
+    return {valid: false, error: 'TOO_SHORT'}
+  } else if (!contains_thanks(mywords)) {
+    return {valid: false, error: 'NO_THANKS'}
+  } else if (!contains_apology(mywords)) {
+    return {valid: false, error: 'NO_APOLOGY'}
+  } else {
+    return {valid: true}
+  }
 }
 
 //determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
