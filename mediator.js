@@ -140,7 +140,7 @@ bot.on('delivery', (payload, reply) => {
         if (err) {console.log(err)
         } else {
         }})
-    } else if (last_message.indexOf("Great, I hope this has been productive.") >= 0) {
+    } else if (last_message != undefined && last_message.indexOf("Great, I hope this has been productive.") >= 0) {
       console.log("Removing conversation") 
       delete people[people[human_name]["correspondent_name"]]
       delete people[human_name]
@@ -246,6 +246,7 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
       bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
         if (err) console.log(err) 
           bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
+          people[people[name]["correspondent_name"]].last_message =  "Now I want you to take a few minutes to brainstorm and propose a potential solution."
       })
   var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
   response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
