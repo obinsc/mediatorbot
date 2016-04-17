@@ -50,6 +50,7 @@ function determine_name(msg, callback) {
           candidates[data] +=1;
         }
       }
+      console.log(max_candidate(candidates));
       callback(max_candidate(candidates));
     }
   };
