@@ -248,11 +248,15 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
       // Only forward problem restatements after both parties have sent in theirs
       bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
         if (err) console.log(err) 
+          people[people[name]["correspondent_name"]].last_message =  "Now I want you to take a few minutes to brainstorm and propose a potential solution."
           bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
-            people[people[name]["correspondent_name"]].last_message =  "Now I want you to take a few minutes to brainstorm and propose a potential solution."
       })
       var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-      response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+      msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '.";
+      people[people[name]].last_message = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+      bot.sendMessage(people[name], {"text": '"' + msg + '"'}, (err, info) => {
+        if (err) console.log(err)
+      }
     } else {
       response = correspondent_fname + " says: "
     }
