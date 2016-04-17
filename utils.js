@@ -9,7 +9,8 @@ module.exports = {
   determine_name: determine_name,
   is_clean: is_clean,
   is_affirmative: is_affirmative,
-  process_closing: process_closing
+  process_closing: process_closing,
+  contains_done: contains_done
 };
 
 names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });

@@ -14,7 +14,7 @@ headers = {
 }
 
 // Example usage
-//analyze_sentiment("Omg I can't stand Christine. I love her, but I hate her too. You know?", mycallback);
+analyze_sentiment("Omg I can't stand Christine. I love her, but I hate her too. You know?", mycallback);
 //analyze_key_phrases("Omg I can't stand Christine Smith. I love her, but I hate her too. You know?", mycallback);
 
 function analyze_sentiment(msg, callback) {
@@ -24,9 +24,8 @@ function analyze_sentiment(msg, callback) {
     lst = msg.split(/[\.|\?]/);
     console.log(lst);
     data = [];
-    for(i = 0; i<lst.length; i++) {
-      data.push({"id": "sentence-"+i.toString(), "text": msg[i]})
-    }
+    i=0;
+    data.push({"id": "sentence-"+i.toString(), "text": msg[i]})
     return {"documents": data};
   }
 
@@ -38,8 +37,9 @@ function analyze_sentiment(msg, callback) {
     json: body
   };
 
-  request.post(options, callback);
-
+  request.post(options, (error, response, body) => {
+    callback(error, response, body.documents[0].score);
+  });
 }
 
 function analyze_key_phrases(msg, callback) {

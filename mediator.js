@@ -41,13 +41,10 @@ bot.on('message', (payload, reply) => {
   let text = payload.message.text
 
   // Run sentiment analysis
-	myFirebaseRef.set({ sentimentalScore: sentiment.analyze_sentiment(text, (error, response, body) => {
-		  if (!error && response.statusCode == 200) {
-		    console.log(body);
-		  }
-		  console.log(response.statusCode);
-		}) 
-	});
+  //
+  sentiment.analyze_sentiment(text, (error, response, body) => {
+    myFirebaseRef.set({ "sentimentalScore": body })
+  });
 
   var response = ""
 
@@ -86,11 +83,11 @@ bot.on('message', (payload, reply) => {
         switch(people[name]["mediation_state"]) {
           case state.INITIAL_RULES:
             console.log("Case: Initial Rules")
-            console.log(response)
-            if (response == "") {
-              response = "Sweet!" // P2 start
-            }
-            people[name]["mediation_state"] = state.INITIAL_YOU
+          console.log(response)
+          if (response == "") {
+            response = "Sweet!" // P2 start
+          }
+          people[name]["mediation_state"] = state.INITIAL_YOU
           break;
           case state.INITIAL_YOU:
             console.log("Case: Initial you")
@@ -110,14 +107,14 @@ bot.on('message', (payload, reply) => {
             response = state_solution_propose(profile, text, name, correspondent_fname)
           break;
           case state.SOLUTION_DISCUSS:
-          	response = state_solution_discuss(profile, text)
-            break;
+            response = state_solution_discuss(profile, text)
+          break;
           case state.SOLUTION_RESOLVED:
-          	response = state_solution_resolved(profile, text, correspondent_fname)
-            break;
+            response = state_solution_resolved(profile, text, correspondent_fname)
+          break;
           case state.THANK_YOU:
             response = state_thank_you(profile, text, name, correspondent_fname)
-            break;
+          break;
           default:
             //default code block
             break;
@@ -252,10 +249,10 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
       bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
         if (err) console.log(err) 
           bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
-          people[people[name]["correspondent_name"]].last_message =  "Now I want you to take a few minutes to brainstorm and propose a potential solution."
+            people[people[name]["correspondent_name"]].last_message =  "Now I want you to take a few minutes to brainstorm and propose a potential solution."
       })
-  var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-  response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+      var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+      response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
     } else {
       response = correspondent_fname + " says: "
     }
@@ -268,44 +265,44 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
 };
 
 function state_solution_discuss(profile, msg) {
-	var response = "";
-	if (utils.is_clean(msg)) {
-		// Proceed to next stage when a word is triggered and both parties confirm
-		if (utils.contains_done(msg)) {
-			response = "Have you both come to a resolution?" // ASK FOR CONFORMATION
-			people[name]["mediation_state"] = state.SOLUTION_RESOLVED
-			people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_RESOLVED
-		} else {
-			// Otherwise, forward message to other person
-			response = correspondent_fname + ' says: '
-			bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { if (err) console.log(err) })
-		}
-	} else {
-		response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
-	}
+  var response = "";
+  if (utils.is_clean(msg)) {
+    // Proceed to next stage when a word is triggered and both parties confirm
+    if (utils.contains_done(msg)) {
+      response = "Have you both come to a resolution?" // ASK FOR CONFORMATION
+      people[name]["mediation_state"] = state.SOLUTION_RESOLVED
+      people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_RESOLVED
+    } else {
+      // Otherwise, forward message to other person
+      response = correspondent_fname + ' says: '
+      bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { if (err) console.log(err) })
+    }
+  } else {
+    response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+  }
 
-	return response;
+  return response;
 };
 
 function state_solution_resolved(profile, msg, correspondent_fname) {
-	var response = "";
-	// Confirmation
-	if (utils.is_affirmative(msg)) {
-		people[name]["is_done"] = true
-		if (people[people[name]["correspondent_name"]]["is_done"] == true) {
-			people[name]["mediation_state"] = state.THANK_YOU
-			people[people[name]["correspondent_name"]]["mediation_state"] = state.THANK_YOU
-			response = "You both agree! Last step: please thank each other for working together to come to a compromise."
-			bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+response+'"'}, (err, info) => { if (err) console.log(err) })
-		} else {
-			response = "Great! Now we just need to wait for " + correspondent_fname + " to respond"
-		}
-	} else { // Go back
-		people[name]["mediation_state"] = state.SOLUTION_DISCUSS
-		people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_DISCUSS
-		response = "At least one of you didn't agree- I'll give you a few more minutes to talk this over"
-	}
-	return response;
+  var response = "";
+  // Confirmation
+  if (utils.is_affirmative(msg)) {
+    people[name]["is_done"] = true
+    if (people[people[name]["correspondent_name"]]["is_done"] == true) {
+      people[name]["mediation_state"] = state.THANK_YOU
+      people[people[name]["correspondent_name"]]["mediation_state"] = state.THANK_YOU
+      response = "You both agree! Last step: please thank each other for working together to come to a compromise."
+      bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+response+'"'}, (err, info) => { if (err) console.log(err) })
+    } else {
+      response = "Great! Now we just need to wait for " + correspondent_fname + " to respond"
+    }
+  } else { // Go back
+    people[name]["mediation_state"] = state.SOLUTION_DISCUSS
+    people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_DISCUSS
+    response = "At least one of you didn't agree- I'll give you a few more minutes to talk this over"
+  }
+  return response;
 };
 
 function state_thank_you(profile, msg, name, correspondent_fname) {
