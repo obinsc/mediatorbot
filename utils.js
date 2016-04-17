@@ -14,16 +14,19 @@ module.exports = {
 };
 
 names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });
-names.split("\n")
+names = names.split("\n")
 console.log("Names loaded")
 
 affirmative_list = fs.readFileSync('./data/yes.txt', {encoding: 'utf8' });
-affirmative_list.split("\n")
+affirmative_list = affirmative_list.split("\n")
 console.log("Yes loaded")
 
 done_list = fs.readFileSync('./data/done.txt', {encoding: 'utf8' });
-done_list.split("\n")
+done_list = done_list.split("\n")
 console.log("Done loaded")
+
+// console.log("\n done list:\n" + done_list + "\n")
+// console.log("result: " + contains_done("Harrison Pincket is a swell guy"))
 
 /*
  * Determine's the name of the friend to contact.
@@ -113,6 +116,8 @@ function contains_done(msg) {
   msg = msg.toLowerCase();
   for (var i = 0; i < done_list.length; i++) {
     if (msg.indexOf(done_list[i]) >= 0) {
+      console.log(msg)
+      console.log(done_list[i])
       return true
     }
   }

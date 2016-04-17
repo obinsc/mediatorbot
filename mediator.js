@@ -41,7 +41,6 @@ bot.on('message', (payload, reply) => {
   let text = payload.message.text
 
   // Run sentiment analysis
-  //
   sentiment.analyze_sentiment(text, (error, response, body) => {
     myFirebaseRef.update({ "sentimentalScore": body })
   });
