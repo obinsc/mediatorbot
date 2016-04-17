@@ -52,7 +52,7 @@ bot.on('message', (payload, reply) => {
 
       var name = profile.first_name + ' ' + profile.last_name
 
-      if (!(name in people)) {
+      if (!(name in people) || people[name]["correspondent_name"] == "") {
         initialize_new_convo(name, payload, (response) => {
         	if (response != "To get started, type the name person you want to start a session with using the following format: Firstname Lastname. Then have them message MediatorBot too!") {
         		people[name].last_message = response;
@@ -83,13 +83,13 @@ bot.on('message', (payload, reply) => {
         var correspondent_fname = people[name]["correspondent_name"].split(" ")[0]
         switch(people[name]["mediation_state"]) {
           case state.INITIAL_RULES:
-            console.log("Case: Initial Rules")
-          console.log(response)
-          if (response == "") {
-            response = "Sweet!" // P2 start
-          }
-          people[name]["mediation_state"] = state.INITIAL_YOU
-          break;
+			console.log("Case: Initial Rules")
+			console.log(response)
+			if (response == "") {
+				response = "Sweet!" // P2 start
+			}
+			people[name]["mediation_state"] = state.INITIAL_YOU
+          	break;
           case state.INITIAL_YOU:
             console.log("Case: Initial you")
           response = state_initial_you(profile, text, name);
@@ -183,7 +183,7 @@ function initialize_new_convo(name, payload, callback) {
   		// Store name
 	    people[name]["correspondent_name"] = c_name
 	    console.log(c_name);
-	    console.log(people[name]["correspodent+name"])
+	    console.log(people[name]["correspondent_name"])
 
 	    // Create new name
 	    people[c_name] = {
