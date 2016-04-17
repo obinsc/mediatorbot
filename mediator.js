@@ -42,7 +42,15 @@ bot.on('message', (payload, reply) => {
       var name = profile.first_name + ' ' + profile.last_name
 
       if (!(name in people)) {
-        response = initialize_new_convo(name, payload)
+        initialize_new_convo(name, payload, (response) => {
+          reply({ "text":response }, (err) => {
+            if (err) {
+              throw err
+            } else {
+              people[name].last_message = response;
+            }
+          })
+        })
       }
 
       // Update global array with convo info
@@ -121,7 +129,7 @@ bot.on('message', (payload, reply) => {
           */
           break;
           case state.SOLUTION_PROPOSE:
-            response = state_problem_propose(profile, msg, name, correspondent_fname)
+            response = state_problem_propose(profile, text, name, correspondent_fname)
             /*
             if (utils.is_clean(text)) {
             if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_DISCUSS) {
@@ -182,7 +190,7 @@ bot.on('delivery', (payload, reply) => {
 })
 
 // Initialize entry in global array
-function initialize_new_convo(name, payload) {
+function initialize_new_convo(name, payload, callback) {
 
   console.log("Initializing a new convo")
 
@@ -193,12 +201,14 @@ function initialize_new_convo(name, payload) {
     "conversation":[],
     "last_message":""
   }
-  console.log("HDFDFD")
+
   idsToPpl[payload.sender.id] = name
 
   utils.determine_name(payload.message.text, (c_name) => {
     // Store name
     people[name]["correspondent_name"] = c_name
+    console.log(c_name);
+    console.log(people[name]["correspodent+name"])
 
     // Create new name
     people[c_name] = {
@@ -207,10 +217,8 @@ function initialize_new_convo(name, payload) {
       "mediation_state":state.INITIAL_RULES,
       "conversation":[]
     }
+    callback("Hmm, sounds like you coudl use a mediator.")
   })
-
-  // Initial response
-  return "Hmm, sounds like you could use a mediator."
 }
 
 function state_initial_rules(profile, msg) {
