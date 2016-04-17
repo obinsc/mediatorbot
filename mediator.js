@@ -35,6 +35,9 @@ bot.on('message', (payload, reply) => {
 
 	// Initialize entry in global array
     if (!(name in people)) {
+    	// Initial response
+    	response = "Hmm, sounds like you could use a mediator."
+
     	people[name] = {
     		"id": payload.sender.id,
     		"correspondent_name":"",
@@ -54,9 +57,6 @@ bot.on('message', (payload, reply) => {
 	    		"conversation":[]
 	    	}
     	})
-
-    	// Initial response
-    	response = "Hmm, sounds like you could use a mediator."
     }
 
     // Update global array with convo info
@@ -74,13 +74,6 @@ bot.on('message', (payload, reply) => {
     	switch(people[name]["mediation_state"]) {
 		    case state.INITIAL_RULES:
 		    	if (response == "") response = "Sweet!" // P2 start
-		    	bot.sendMessage(payload.sender.id, {"text":"Let's first agree to some ground rules:"}, (err, info) => {
-		    		if (err) console.log(err)
-					bot.sendMessage(payload.sender.id, {"text":"Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise."}, (err, info) => { 
-						if (err) console.log(err)
-						bot.sendMessage(payload.sender.id, {"text":"Are you willing to follow them?"}, (err, info) => { if (err) console.log(err) })
-					})
-				})
 				people[name]["mediation_state"] = state.INITIAL_YOU
 		        break;
 		    case state.INITIAL_YOU:
@@ -111,9 +104,12 @@ bot.on('message', (payload, reply) => {
 		    	if (utils.is_clean(text)) {
 		    		if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_PROPOSE) {
 		    			// Only forward problem restatements after both parties have sent in theirs
-			    		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+text+'"'}, (err, info) => { if (err) console.log(err) })
+			    		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+text+'"'}, (err, info) => { 
+			    			if (err) console.log(err)
+			    			bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to restate " + profile.first_name + "'s viewpoint, in your own words."}, (err, info) => { if (err) console.log(err) })
+			    		})
 			    		var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-			    		response = 'Summer says: "' + correspondent_responses[correspondent_responses.length-1] + '"'
+			    		response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '"\n\nNow I want you to restate ' + correspondent_fname + '\'s viewpoint, in your own words.'			    		
 			    	} else {
 			    		response = correspondent_fname + " says: "
 			    	}
@@ -123,6 +119,28 @@ bot.on('message', (payload, reply) => {
 		    	}
 		    	break;
 		    case state.SOLUTION_PROPOSE:
+		    	if (utils.is_clean(text)) {
+		    		if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_DISCUSS) {
+		    			// Only forward problem restatements after both parties have sent in theirs
+			    		bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+text+'"'}, (err, info) => { 
+			    			if (err) console.log(err) 
+			    			bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
+			    		})
+			    		var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+			    		response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+			    	} else {
+			    		response = correspondent_fname + " says: "
+			    	}
+			    	people[name]["mediation_state"] = state.SOLUTION_DISCUSS;
+		    	} else {
+		    		response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+		    	}
+		    	break;
+		    case state.SOLUTION_DISCUSS:
+		    	break;
+		    case state.SOLUTION_RESOLVED:
+		    	break;
+		    case state.THANK_YOU:
 		    	break;
 		    default:
 		        //default code block
@@ -131,12 +149,22 @@ bot.on('message', (payload, reply) => {
     }
 
     reply({ "text":response }, (err) => {
-      if (err) throw err
+    	if (err) throw err
 
-      console.log(`Sent to ${profile.first_name} ${profile.last_name}: ${response}`)
+		if (response == "Hmm, sounds like you could use a mediator." || response == "Sweet!") {
+			bot.sendMessage(people[name]["id"], {"text":"Let's first agree to some ground rules:"}, (err, info) => { 
+				if (err) console.log(err) 
+				bot.sendMessage(people[name]["id"], {"text":"Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise."}, (err, info) => { 
+					if (err) console.log(err)
+					bot.sendMessage(people[name]["id"], {"text":"Are you willing to follow them?"}, (err, info) => { if (err) console.log(err) })
+				})
+			})
+		}
 
-  	  // spy
-  	  console.log(people)
+		console.log(`Sent to ${profile.first_name} ${profile.last_name}: ${response}`)
+
+		// spy
+		console.log(people)
     })
   })
 })
