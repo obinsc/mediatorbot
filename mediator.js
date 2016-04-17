@@ -3,6 +3,9 @@
 const http = require('http')
 const Bot = require('messenger-bot')
 const utils = require('./utils.js')
+const sentiment = require('./ms_text_analysis.js')
+var Firebase = require("firebase");
+var myFirebaseRef = new Firebase("https://mediatorbot.firebaseio.com/");
 
 let bot = new Bot({
   token: 'CAAOtqaBBm0cBAGLEGkflZANFKDA5PGZBsZAc8sM4exAJm2L2OgUGIJu7ZC24RbCTVJihAOG4ZBwhOlRCZCZBcuH5n9VTS0ZAqZBIgF3kOYVd4eI2fI79ILwXmcPvXhLAZA2BGaiXdOGfV83O7ZBSCW2XZB1NJZB0Aa1ajfZCMe8ZBZAJNnQ34DSAQ9gpKxkY6zaP76uwZC4C97jsc4JEqEQZDZD'
@@ -36,6 +39,10 @@ var state = {
 
 bot.on('message', (payload, reply) => {
   let text = payload.message.text
+
+  // Run sentiment analysis
+	//myFirebaseRef.set({ sentimentalScore: "Hello World!" });
+
   var response = ""
 
   bot.getProfile(payload.sender.id, (err, profile) => {
