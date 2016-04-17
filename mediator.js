@@ -16,7 +16,8 @@ var msgFollowUps = {
   "Hmm, sounds like you could use a mediator.": "Let's first agree to some ground rules:",
   "Sweet!": "Let's first agree to some ground rules:",
   "Let's first agree to some ground rules:":  "Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise.",
-  "Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise.": "Are you willing to follow them?"
+  "Work to resolve the conflict. Treat each other with respect. Be clear and truthful about what is really bothering you and what you want to change. Listen to other participants and make an effort to understand the views of others. Be willing to take responsibility for your behavior. Be willing to compromise.": "Are you willing to follow them?",
+  "Now I want you to take a few minutes to brainstorm and propose a potential solution.": "Go ahead and send me the solution when you're ready"
 }
 
 // Mediation State
@@ -29,7 +30,8 @@ var state = {
   'SOLUTION_PROPOSE': 5,
   'SOLUTION_DISCUSS': 6,
   'SOLUTION_RESOLVED': 7,
-  'THANK_YOU': 8
+  'THANK_YOU': 8,
+  'DONE':9
 };
 
 bot.on('message', (payload, reply) => {
@@ -69,12 +71,12 @@ bot.on('message', (payload, reply) => {
         switch(people[name]["mediation_state"]) {
           case state.INITIAL_RULES:
             console.log("Case: Initial Rules")
-            if (response == "") response = "Sweet!" // P2 start
+          if (response == "") response = "Sweet!" // P2 start
             people[name]["mediation_state"] = state.INITIAL_YOU
           break;
           case state.INITIAL_YOU:
             console.log("Case: Initial you")
-            response = state_initial_you(profile, text, name);
+          response = state_initial_you(profile, text, name);
           /*
              if (utils.is_affirmative(text)) {
              response = 'Great! I also ask that you use the word "I" and avoid using the word "you," as that may come off as accusatory to the other person. Are you okay with that?'
@@ -86,68 +88,68 @@ bot.on('message', (payload, reply) => {
           break;
           case state.INITIAL_FORWARDING:
             console.log("Case: Initial Forwarding")
-            response = state_initial_forwarding(profile, text, name, correspondent_fname);
-            /*
-            if (utils.is_affirmative(text)) {
-            response = "Awesome. Keep in mind that we'll be relaying your messages to " + correspondent_fname + ", and " + correspondent_fname + "'s messages to you."
-            people[name]["mediation_state"] = state.PROBLEM_DEFINITION
-          } else {
-            response = "Why don't you take a walk and then come back when you're ready to proceed?"
-          }
-          */
+          response = state_initial_forwarding(profile, text, name, correspondent_fname);
+          /*
+             if (utils.is_affirmative(text)) {
+             response = "Awesome. Keep in mind that we'll be relaying your messages to " + correspondent_fname + ", and " + correspondent_fname + "'s messages to you."
+             people[name]["mediation_state"] = state.PROBLEM_DEFINITION
+             } else {
+             response = "Why don't you take a walk and then come back when you're ready to proceed?"
+             }
+             */
           break;
           case state.PROBLEM_DEFINITION:
             response = state_problem_definition(profile, text, name, correspondent_fname);
-            /*
-            if (utils.is_affirmative(text)) {
-            response = "Alright! Let's get started: tell " + correspondent_fname + " what the problem is, in your own words."
-            people[name]["mediation_state"] = state.PROBLEM_RESTATE
-          } else {
-            response = "Why don't you take a walk and then come back when you're ready to proceed?"
-          }
-          */
+          /*
+             if (utils.is_affirmative(text)) {
+             response = "Alright! Let's get started: tell " + correspondent_fname + " what the problem is, in your own words."
+             people[name]["mediation_state"] = state.PROBLEM_RESTATE
+             } else {
+             response = "Why don't you take a walk and then come back when you're ready to proceed?"
+             }
+             */
           break;
           case state.PROBLEM_RESTATE:
             response = state_problem_restate(profile, text, name, correspondent_fname)
-            /*
-            if (utils.is_clean(text)) {
-            if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_PROPOSE) {
+          /*
+             if (utils.is_clean(text)) {
+             if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_PROPOSE) {
               // Only forward problem restatements after both parties have sent in theirs
               bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+text+'"'}, (err, info) => { 
-                if (err) console.log(err)
-                  bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to restate " + profile.first_name + "'s viewpoint, in your own words."}, (err, info) => { if (err) console.log(err) })
+              if (err) console.log(err)
+              bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to restate " + profile.first_name + "'s viewpoint, in your own words."}, (err, info) => { if (err) console.log(err) })
               })
-          var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-          response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '"\n\nNow I want you to restate ' + correspondent_fname + '\'s viewpoint, in your own words.'			    		
-            } else {
+              var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+              response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '"\n\nNow I want you to restate ' + correspondent_fname + '\'s viewpoint, in your own words.'			    		
+              } else {
               response = correspondent_fname + " says: "
-            }
-            people[name]["mediation_state"] = state.SOLUTION_PROPOSE;
-          } else {
-            response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
-          }
-          */
+              }
+              people[name]["mediation_state"] = state.SOLUTION_PROPOSE;
+              } else {
+              response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+              }
+              */
           break;
           case state.SOLUTION_PROPOSE:
             response = state_problem_propose(profile, text, name, correspondent_fname)
-            /*
-            if (utils.is_clean(text)) {
-            if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_DISCUSS) {
+          /*
+             if (utils.is_clean(text)) {
+             if (people[people[name]["correspondent_name"]]["mediation_state"] == state.SOLUTION_DISCUSS) {
               // Only forward problem restatements after both parties have sent in theirs
               bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+text+'"'}, (err, info) => { 
-                if (err) console.log(err) 
-                  bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
+              if (err) console.log(err) 
+              bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
               })
-          var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-          response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
-            } else {
+              var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+              response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '."\n\nNow I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
+              } else {
               response = correspondent_fname + " says: "
-            }
-            people[name]["mediation_state"] = state.SOLUTION_DISCUSS;
-          } else {
-            response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
-          }
-          */
+              }
+              people[name]["mediation_state"] = state.SOLUTION_DISCUSS;
+              } else {
+              response = "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+              }
+              */
           break;
           case state.SOLUTION_DISCUSS:
             break;
@@ -264,8 +266,8 @@ function state_problem_restate(profile, msg, name, correspondent_fname) {
         if (err) {console.log(err)}
         bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to restate " + profile.first_name + "'s viewpoint, in your own words."}, (err, info) => { if (err) console.log(err) })
       })
-  var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-  response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '"\n\nNow I want you to restate ' + correspondent_fname + '\'s viewpoint, in your own words.'
+    var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+    response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '"\n\nNow I want you to restate ' + correspondent_fname + '\'s viewpoint, in your own words.'
     } else {
       response = correspondent_fname + " says: "
     }
@@ -304,11 +306,38 @@ function state_solution_propose(profile, msg) {
 function state_solution_discuss(profile, msg) {
 };
 
-function state_solution_resolved(profile, msg) {
+function state_solution_resolved(profile, msg, correspondent_fname) {
 };
 
 function state_thank_you(profile, msg) {
-};
+  if (!utils.is_clean(msg)) {
+    return "Hey, no swearing! I'm going to have to ask you to reword that before I forward your message."
+  }
+  var res = utils.process_closing(msg)
+  if (!res.valid) {
+    if (res.error == 'TOO_SHORT') {
+      return "Hmmm, that seems pretty short for a thanks and an apology. Be kind."
+    } else if (res.error == 'NO_THANKS') {
+      return "Can you please thank your partner? Give it another shot."
+    } else if (res.error == 'NO_APOLOGY') {
+      return "Don't forget to apologize! Try it again please."
+    }
+  }
+
+  if(people[pepole[name]["correspondent_name"]]["mediation_state"] == state.DONE) {
+    // Only forward problem restatements after both parties have sent in theirs
+    bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":'"'+msg+'"'}, (err, info) => { 
+      if (err) console.log(err) 
+        bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Great, I hope this has been productive. Consider hiring a human mediator for future problems."}, (err, info) => { if (err) console.log(err) })
+    })
+var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
+response = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '.\n\n Great, I hope this has been productive. Consider hiring a human mediator for future problems.'
+  } else {
+    response = correspondent_fname + " says: "
+  }
+  people[name]["mediation_state"] = state.DONE;
+}
+
 
 
 http.createServer(bot.middleware()).listen(8445)
