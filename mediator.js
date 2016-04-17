@@ -109,7 +109,7 @@ bot.on('message', (payload, reply) => {
             response = state_solution_discuss(profile, text, name, correspondent_fname)
           break;
           case state.SOLUTION_RESOLVED:
-            response = state_solution_resolved(profile, text, correspondent_fname)
+            response = state_solution_resolved(profile, text, name, correspondent_fname)
           break;
           case state.THANK_YOU:
             response = state_thank_you(profile, text, name, correspondent_fname)
@@ -277,6 +277,7 @@ function state_solution_discuss(profile, msg, name, correspondent_fname) {
     // Proceed to next stage when a word is triggered and both parties confirm
     if (utils.contains_done(msg)) {
       response = "Have you both come to a resolution?" // ASK FOR CONFORMATION
+      bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Have you both come to a resolution?"}, (err, info) => { if (err) console.log(err) })
       people[name]["mediation_state"] = state.SOLUTION_RESOLVED
       people[people[name]["correspondent_name"]]["mediation_state"] = state.SOLUTION_RESOLVED
     } else {
@@ -291,7 +292,7 @@ function state_solution_discuss(profile, msg, name, correspondent_fname) {
   return response;
 };
 
-function state_solution_resolved(profile, msg, correspondent_fname) {
+function state_solution_resolved(profile, msg, name, correspondent_fname) {
   var response = "";
   // Confirmation
   if (utils.is_affirmative(msg)) {
