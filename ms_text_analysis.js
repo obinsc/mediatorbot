@@ -1,7 +1,7 @@
 var request = require('request');
 
 module.exports = {
-  sentiment: analyze_sentiment,
+  analyze_sentiment: analyze_sentiment,
   key_phrases: analyze_key_phrases
 };
 

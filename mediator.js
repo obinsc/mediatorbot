@@ -41,7 +41,13 @@ bot.on('message', (payload, reply) => {
   let text = payload.message.text
 
   // Run sentiment analysis
-	//myFirebaseRef.set({ sentimentalScore: "Hello World!" });
+	myFirebaseRef.set({ sentimentalScore: sentiment.analyze_sentiment(text, (error, response, body) => {
+		  if (!error && response.statusCode == 200) {
+		    console.log(body);
+		  }
+		  console.log(response.statusCode);
+		}) 
+	});
 
   var response = ""
 
