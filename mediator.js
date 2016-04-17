@@ -252,11 +252,11 @@ function state_solution_propose(profile, msg, name, correspondent_fname) {
           bot.sendMessage(people[people[name]["correspondent_name"]]["id"], {"text":"Now I want you to take a few minutes to brainstorm and propose a potential solution."}, (err, info) => { if (err) console.log(err) })
       })
       var correspondent_responses = people[people[name]["correspondent_name"]]["conversation"]
-      msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1] + '.";
+      msg = correspondent_fname + ' says: "' + correspondent_responses[correspondent_responses.length-1];
       people[people[name]].last_message = 'Now I want you to take a few minutes to think about to brainstorm and propose a potential solution.'
       bot.sendMessage(people[name], {"text": '"' + msg + '"'}, (err, info) => {
         if (err) console.log(err)
-      }
+      })
     } else {
       response = correspondent_fname + " says: "
     }
