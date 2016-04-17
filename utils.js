@@ -134,23 +134,28 @@ function process_closing(msg) {
   }
 
   function contains_apology(mywords) {
-    if(msg.indexof('sorry') >= 0 || msg.indexof('apolog')) {
+    if(msg.indexOf('sorry') >= 0 || msg.indexof('apolog')) {
       return true
     }
     return false
   }
 
-  words = msg.split(/[\.|\?]/);
+  words = msg.split(" ")
   // Too Short
+  console.log(words)
   if(words.length < 5) {
     return {valid: false, error: 'TOO_SHORT'}
-  } else if (!contains_thanks(mywords)) {
+  } else if (!contains_thanks(words)) {
     return {valid: false, error: 'NO_THANKS'}
-  } else if (!contains_apology(mywords)) {
+  } else if (!contains_apology(words)) {
     return {valid: false, error: 'NO_APOLOGY'}
   } else {
     return {valid: true}
   }
 }
+
+console.log(process_closing("I am sorry a  bc d asdf d fdf "))
+console.log(process_closing("I am sorry a  bc d asdf d fdf thank"))
+console.log(process_closing("I am sorry a  bc d asdf d fdf thank and apologize"))
 
 //determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
