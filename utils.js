@@ -134,7 +134,7 @@ function process_closing(msg) {
   }
 
   function contains_apology(mywords) {
-    if(msg.indexOf('sorry') >= 0 || msg.indexof('apolog')) {
+    if(msg.indexOf('sorry') >= 0 || msg.indexOf('apolog')) {
       return true
     }
     return false
@@ -147,8 +147,8 @@ function process_closing(msg) {
     return {valid: false, error: 'TOO_SHORT'}
   } else if (!contains_thanks(words)) {
     return {valid: false, error: 'NO_THANKS'}
-  } else if (!contains_apology(words)) {
-    return {valid: false, error: 'NO_APOLOGY'}
+  //} else if (!contains_apology(words)) {
+    //return {valid: false, error: 'NO_APOLOGY'}
   } else {
     return {valid: true}
   }
