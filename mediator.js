@@ -54,14 +54,16 @@ bot.on('message', (payload, reply) => {
 
       if (!(name in people)) {
         initialize_new_convo(name, payload, (response) => {
-          people[name].last_message = response;
-          people[name]["mediation_state"] = state.INITIAL_YOU
-          reply({ "text":response }, (err) => {
-            if (err) {
-              throw err
-            } else {
-            }
-          })
+        	if (response != "To get started, type the name person you want to start a session with using the following format: Firstname Lastname. Then have them message MediatorBot too!") {
+        		people[name].last_message = response;
+				people[name]["mediation_state"] = state.INITIAL_YOU	
+        	}
+        	reply({ "text":response }, (err) => {
+				if (err) {
+				  throw err
+				} else {
+				}
+			})
         })
         return
       }
@@ -176,7 +178,7 @@ function initialize_new_convo(name, payload, callback) {
 
   utils.determine_name(payload.message.text, (c_name) => {
   	if (c_name == null) {
-  		callback("To get started, type the name person you want to start a session with using the following format: Firstname Lastname. Then have them message MediatorBot too.")
+  		callback("To get started, type the name person you want to start a session with using the following format: Firstname Lastname. Then have them message MediatorBot too!")
   	} else {
   		// Store name
 	    people[name]["correspondent_name"] = c_name
