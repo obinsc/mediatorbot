@@ -33,30 +33,8 @@ bot.on('message', (payload, reply) => {
 
     var name = profile.first_name + ' ' + profile.last_name
 
-	// Initialize entry in global array
     if (!(name in people)) {
-    	// Initial response
-    	response = "Hmm, sounds like you could use a mediator."
-
-    	people[name] = {
-    		"id": payload.sender.id,
-    		"correspondent_name":"",
-    		"mediation_state":state.INITIAL_RULES,
-    		"conversation":[]
-    	}
-
-    	utils.determine_name(text, (c_name) => {
-    		// Store name
-    		people[name]["correspondent_name"] = c_name
-
-    		// Create new name
-    		people[c_name] = {
-	    		"id": "",
-	    		"correspondent_name":name,
-	    		"mediation_state":state.INITIAL_RULES,
-	    		"conversation":[]
-	    	}
-    	})
+      response = initialize_new_convo(name, payload)
     }
 
     // Update global array with convo info
@@ -169,6 +147,33 @@ bot.on('message', (payload, reply) => {
   })
 })
 
+// Initialize entry in global array
+function initialize_new_convo(name, payload) {
+
+    people[name] = {
+      "id": payload.sender.id,
+      "correspondent_name":"",
+      "mediation_state":state.INITIAL_RULES,
+      "conversation":[]
+    }
+
+    utils.determine_name(payload.message.text, (c_name) => {
+      // Store name
+      people[name]["correspondent_name"] = c_name
+
+      // Create new name
+      people[c_name] = {
+        "id": "",
+        "correspondent_name":name,
+        "mediation_state":state.INITIAL_RULES,
+        "conversation":[]
+      }
+    })
+
+    // Initial response
+    return "Hmm, sounds like you could use a mediator."
+}
+
 // state_fns = {
 //   function state_initial_rules(profile, msg) {
 //   };
@@ -202,3 +207,4 @@ bot.on('message', (payload, reply) => {
 // }
 
 http.createServer(bot.middleware()).listen(8445)
+//http.createServer(bot.verify('verify_token')).listen(8445)

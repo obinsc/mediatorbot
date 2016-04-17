@@ -14,9 +14,11 @@ module.exports = {
 
 names = fs.readFileSync('./data/names.txt',{ encoding: 'utf8' });
 names.split("\n")
+console.log("Names loaded")
 
 affirmative_list = fs.readFileSync('./data/yes.txt', {encoding: 'utf8' });
 affirmative_list.split("\n")
+console.log("Yes loaded")
 
 /*
  * Determine's the name of the friend to contact.
@@ -127,6 +129,7 @@ function process_closing(msg) {
     return {valid: false, error: 'NO_APOLOGY'}
   } else {
     return {valid: true}
+  }
 }
 
 //determine_name("Harrison Pincket is a swell guy", function(a) { console.log(a);})
